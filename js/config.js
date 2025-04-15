@@ -47,6 +47,10 @@ const API_SITES = {
         api: 'https://cjhwba.com',
         name: '新华为',
     },
+    hwba: {
+        api: 'https://cjwba.com',
+        name: '华为吧资源',
+    },
     jisu: {
         api: 'https://jszyapi.com',
         name: '极速资源',
@@ -190,3 +194,6 @@ const CUSTOM_API_CONFIG = {
     cacheExpiry: 5184000000,  // 缓存过期时间(2个月)
     adultPropName: 'isAdult'  // 用于标记成人内容的属性名
 };
+
+// 新增隐藏内置黄色采集站API的变量，默认为true
+const HIDE_BUILTIN_ADULT_APIS = true;

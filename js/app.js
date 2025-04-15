@@ -94,40 +94,43 @@ function initAPICheckboxes() {
         });
     });
     
-    // 添加成人API组标题
-    const adultTitle = document.createElement('div');
-    adultTitle.className = 'api-group-title adult';
-    adultTitle.innerHTML = `黄色资源采集站 <span class="adult-warning">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-        </svg>
-    </span>`;
-    container.appendChild(adultTitle);
-    
-    // 创建成人API源的复选框
-    Object.keys(API_SITES).forEach(apiKey => {
-        const api = API_SITES[apiKey];
-        if (!api.adult) return; // 仅添加成人内容API
+    // 仅在隐藏设置为false时添加成人API组
+    if (!HIDE_BUILTIN_ADULT_APIS) {
+        // 添加成人API组标题
+        const adultTitle = document.createElement('div');
+        adultTitle.className = 'api-group-title adult';
+        adultTitle.innerHTML = `黄色资源采集站 <span class="adult-warning">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+        </span>`;
+        container.appendChild(adultTitle);
         
-        const checked = selectedAPIs.includes(apiKey);
-        
-        const checkbox = document.createElement('div');
-        checkbox.className = 'flex items-center';
-        checkbox.innerHTML = `
-            <input type="checkbox" id="api_${apiKey}" 
-                   class="form-checkbox h-3 w-3 text-blue-600 bg-[#222] border border-[#333] api-adult" 
-                   ${checked ? 'checked' : ''} 
-                   data-api="${apiKey}">
-            <label for="api_${apiKey}" class="ml-1 text-xs text-pink-400 truncate">${api.name}</label>
-        `;
-        container.appendChild(checkbox);
-        
-        // 添加事件监听器
-        checkbox.querySelector('input').addEventListener('change', function() {
-            updateSelectedAPIs();
-            checkAdultAPIsSelected();
+        // 创建成人API源的复选框
+        Object.keys(API_SITES).forEach(apiKey => {
+            const api = API_SITES[apiKey];
+            if (!api.adult) return; // 仅添加成人内容API
+            
+            const checked = selectedAPIs.includes(apiKey);
+            
+            const checkbox = document.createElement('div');
+            checkbox.className = 'flex items-center';
+            checkbox.innerHTML = `
+                <input type="checkbox" id="api_${apiKey}" 
+                       class="form-checkbox h-3 w-3 text-blue-600 bg-[#222] border border-[#333] api-adult" 
+                       ${checked ? 'checked' : ''} 
+                       data-api="${apiKey}">
+                <label for="api_${apiKey}" class="ml-1 text-xs text-pink-400 truncate">${api.name}</label>
+            `;
+            container.appendChild(checkbox);
+            
+            // 添加事件监听器
+            checkbox.querySelector('input').addEventListener('change', function() {
+                updateSelectedAPIs();
+                checkAdultAPIsSelected();
+            });
         });
-    });
+    }
     
     // 初始检查成人内容状态
     checkAdultAPIsSelected();
@@ -850,11 +853,26 @@ async function showDetails(id, vod_name, sourceCode) {
     }
 }
 
-// 更新播放视频函数，修改为在新标签页中打开播放页面
+// 更新播放视频函数，修改为在新标签页中打开播放页面，并保存到历史记录
 function playVideo(url, vod_name, episodeIndex = 0) {
     if (!url) {
         showToast('无效的视频链接', 'error');
         return;
+    }
+    
+    // 获取当前视频来源名称（从模态框标题中提取）
+    let sourceName = '';
+    const modalTitle = document.getElementById('modalTitle');
+    if (modalTitle) {
+        const sourceSpan = modalTitle.querySelector('span.text-gray-400');
+        if (sourceSpan) {
+            // 提取括号内的来源名称, 例如从 "(黑木耳)" 提取 "黑木耳"
+            const sourceText = sourceSpan.textContent;
+            const match = sourceText.match(/\(([^)]+)\)/);
+            if (match && match[1]) {
+                sourceName = match[1].trim();
+            }
+        }
     }
     
     // 保存当前状态到localStorage，让播放页面可以获取
@@ -863,8 +881,23 @@ function playVideo(url, vod_name, episodeIndex = 0) {
     localStorage.setItem('currentEpisodes', JSON.stringify(currentEpisodes));
     localStorage.setItem('episodesReversed', episodesReversed);
     
+    // 构建视频信息对象，使用标题作为唯一标识
+    const videoTitle = vod_name || currentVideoTitle;
+    const videoInfo = {
+        title: videoTitle,
+        url: url,
+        episodeIndex: episodeIndex,
+        sourceName: sourceName,
+        timestamp: Date.now()
+    };
+    
+    // 保存到观看历史，添加sourceName
+    if (typeof addToViewingHistory === 'function') {
+        addToViewingHistory(videoInfo);
+    }
+    
     // 构建播放页面URL，传递必要参数
-    const playerUrl = `player.html?url=${encodeURIComponent(url)}&title=${encodeURIComponent(vod_name)}&index=${episodeIndex}`;
+    const playerUrl = `player.html?url=${encodeURIComponent(url)}&title=${encodeURIComponent(videoTitle)}&index=${episodeIndex}&source=${encodeURIComponent(sourceName)}`;
     
     // 在新标签页中打开播放页面
     window.open(playerUrl, '_blank');
@@ -928,3 +961,15 @@ function toggleEpisodeOrder() {
         }
     }
 }
+
+// app.js 或路由文件中
+const authMiddleware = require('./middleware/auth');
+const config = require('./config');
+
+// 对所有请求启用鉴权（按需调整作用范围）
+if (config.auth.enabled) {
+  app.use(authMiddleware);
+}
+
+// 或者针对特定路由
+app.use('/api', authMiddleware);
