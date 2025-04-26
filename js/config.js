@@ -205,7 +205,7 @@ const CUSTOM_API_CONFIG = {
 const HIDE_BUILTIN_ADULT_APIS = true;
 // 用户认证配置
 const AUTH_CONFIG = {
-    accessCode: '666', // 访问密码
+    accessCode: '888', // 访问密码
     blogPostUrl: 'https://daole.net' // 获取访问密码的博客文章地址
 };
 
