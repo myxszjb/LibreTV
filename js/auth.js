@@ -7,7 +7,7 @@
 const SESSION_DURATION = 24 * 60 * 60 * 1000;
 
 // 备用的默认访问密码（仅在无法从配置读取时使用）
-const DEFAULT_ACCESS_CODE = '666';
+const DEFAULT_ACCESS_CODE = '8888';
 
 /**
  * 检查用户是否已登录
