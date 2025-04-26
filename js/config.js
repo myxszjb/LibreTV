@@ -202,7 +202,7 @@ const CUSTOM_API_CONFIG = {
 };
 
 // 新增隐藏内置黄色采集站API的变量，默认为true
-const HIDE_BUILTIN_ADULT_APIS = true;
+const HIDE_BUILTIN_ADULT_APIS = false;
 // 用户认证配置
 const AUTH_CONFIG = {
     accessCode: '8888', // 访问密码
