@@ -12,6 +12,23 @@
     <link rel="icon" href="image/logo.png">
     <link rel="apple-touch-icon" href="image/logo-black.png">
     <link rel="manifest" href="manifest.json">
+
+
+
+
+    <!-- 引入配置文件 -->
+    <script src="js/config.js"></script>
+    <!-- 引入身份验证模块 -->
+    <script src="js/auth.js"></script>
+    <script>
+        // 在页面加载前检查登录状态
+        if (!isLoggedIn()) {
+            // 未登录，重定向到登录页面
+            window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.pathname.split('/').pop());
+        }
+    </script>
+
+
     
     <script src="libs/tailwindcss.min.js"></script>
     <link rel="stylesheet" href="css/styles.css">
@@ -27,6 +44,16 @@
         </button>
     </div>
 
+<!-- 设置按钮和登出按钮合并 -->
+<div class="fixed top-4 right-4 z-50 flex items-center space-x-2">
+    <!-- 登出按钮 -->
+    <button onclick="logout()" class="bg-[#222] hover:bg-[#333] border border-[#333] hover:border-white rounded-lg px-3 py-1.5 transition-colors flex items-center justify-center" aria-label="退出登录">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+        </svg>
+    </button>
+
+    
     <!-- 设置按钮保留在右上角，并缩小尺寸 -->
     <div class="fixed top-4 right-4 z-10">
         <button onclick="toggleSettings(event)" class="bg-[#222] hover:bg-[#333] border border-[#333] hover:border-white rounded-lg px-3 py-1.5 transition-colors" aria-label="打开设置">
