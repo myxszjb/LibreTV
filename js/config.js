@@ -261,3 +261,8 @@ const CUSTOM_API_CONFIG = {
 
 // 隐藏内置黄色采集站API的变量
 const HIDE_BUILTIN_ADULT_APIS = false;
+// 用户认证配置
+const AUTH_CONFIG = {
+    accessCode: '6666', // 访问密码
+    blogPostUrl: 'https://daole.net' // 获取访问密码的博客文章地址
+};
